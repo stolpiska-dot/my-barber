@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BARBER & STYLE — Премиальный Салон & Барбершоп</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            400: '#F3E5AB',
+                            500: '#D4AF37',
+                            600: '#AA7C11',
+                            700: '#8B6508'
+                        },
+                        dark: {
+                            900: '#0B0C10',
+                            800: '#12141C',
+                            700: '#1F2430',
+                            600: '#2A3040'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0B0C10;
+            color: #E2E8F0;
+            overflow-x: hidden;
+        }
+
+        .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* 3D Canvas Styling */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0B0C10;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D4AF37;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #AA7C11;
+        }
+
+        /* Gold Gradient Effects */
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #FFF0B2 0%, #D4AF37 50%, #996515 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gold-border-glow {
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.15);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .gold-border-glow:hover {
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.35);
+            border-color: rgba(212, 175, 55, 0.7);
+        }
+
+        .glass-panel {
+            background: rgba(18, 20, 28, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-panel-gold {
+            background: rgba(18, 20, 28, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(212, 175, 55, 0.25);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-gold-500 selection:text-black">
+
+    <!-- 3D Background Canvas -->
+    <div id="canvas-container"></div>
+
+    <!-- Navigation Bar -->
+    <nav class="fixed top-0 left-0 w-full z-50 glass-panel border-b border-white/10 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <a href="#" class="flex items-center gap-3 group">
+                    <div class="w-10 h-10 rounded-full border border-gold-500/50 flex items-center justify-center bg-gold-500/10 group-hover:scale-105 transition-transform">
+                        <i class="fa-solid fa-scissors text-gold-500 text-lg"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-serif text-xl font-bold tracking-wider gold-gradient-text">BARBER & STYLE</span>
+                        <span class="text-[10px] tracking-widest text-gray-400 uppercase">Hairstyling & Grooming</span>
+                    </div>
+                </a>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center gap-8 text-sm font-medium">
+                    <a href="#about" class="hover:text-gold-500 transition-colors">О нас</a>
+                    <a href="#why-us" class="hover:text-gold-500 transition-colors">Преимущества</a>
+                    <a href="#services" class="hover:text-gold-500 transition-colors">Услуги и цены</a>
+                    <a href="#gallery" class="hover:text-gold-500 transition-colors">Галерея</a>
+                    <a href="#reviews" class="hover:text-gold-500 transition-colors">Отзывы</a>
+                    <a href="#contacts" class="hover:text-gold-500 transition-colors">Контакты</a>
+                </div>
+
+                <!-- Action Button -->
+                <div class="hidden md:flex items-center gap-4">
+                    <a href="tel:+79990000000" class="text-sm font-semibold text-gray-300 hover:text-white transition-colors">
+                        <i class="fa-solid fa-phone text-gold-500 mr-2"></i>+7 (999) 000-00-00
+                    </a>
+                    <a href="#booking" class="px-5 py-2.5 rounded-full bg-gradient-to-r from-gold-600 to-gold-500 text-black font-semibold text-sm hover:from-gold-500 hover:to-gold-400 transition-all transform hover:-translate-y-0.5 shadow-lg shadow-gold-500/20">
+                        Онлайн-запись
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="md:hidden text-gray-300 hover:text-white focus:outline-none p-2">
+                    <i class="fa-solid fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Drawer -->
+        <div id="mobile-menu" class="hidden md:hidden glass-panel border-b border-white/10 px-4 pt-4 pb-6 space-y-4">
+            <a href="#about" class="block text-gray-300 hover:text-gold-500 transition-colors py-1">О нас</a>
+            <a href="#why-us" class="block text-gray-300 hover:text-gold-500 transition-colors py-1">Преимущества</a>
+            <a href="#services" class="block text-gray-300 hover:text-gold-500 transition-colors py-1">Услуги и цены</a>
+            <a href="#gallery" class="block text-gray-300 hover:text-gold-500 transition-colors py-1">Галерея</a>
+            <a href="#reviews" class="block text-gray-300 hover:text-gold-500 transition-colors py-1">Отзывы</a>
+            <a href="#contacts" class="block text-gray-300 hover:text-gold-500 transition-colors py-1">Контакты</a>
+            <div class="pt-4 border-t border-white/10 flex flex-col gap-3">
+                <a href="tel:+79990000000" class="text-sm font-semibold text-gray-300">
+                    <i class="fa-solid fa-phone text-gold-500 mr-2"></i>+7 (999) 000-00-00
+                </a>
+                <a href="#booking" class="w-full text-center py-3 rounded-full bg-gold-500 text-black font-semibold text-sm">
+                    Онлайн-запись
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Wrapper (Above 3D Canvas) -->
+    <div class="relative z-10 pt-20">
+
+        <!-- Hero Section -->
+        <section class="min-h-[90vh] flex items-center justify-center relative px-4 py-20">
+            <div class="max-w-5xl mx-auto text-center space-y-8">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border border-gold-500/30 text-gold-400 text-xs sm:text-sm font-medium tracking-wide uppercase">
+                    <span class="w-2 h-2 rounded-full bg-gold-500 animate-ping"></span>
+                    Премиальный сервис & Стиль в центре города
+                </div>
+
+                <h1 class="font-serif text-4xl sm:text-6xl md:text-7xl font-bold leading-tight tracking-tight">
+                    Искусство безупречного <br>
+                    <span class="gold-gradient-text">стиля и ухода</span>
+                </h1>
+
+                <p class="text-gray-400 text-base sm:text-xl max-w-2xl mx-auto font-light leading-relaxed">
+                    Мы создаём больше, чем просто стрижки. Это атмосфера мужского клуба, где классические традиции барберинга сочетаются с премиальным сервисом.
+                </p>
+
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                    <a href="#booking" class="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-gold-600 via-gold-500 to-gold-400 text-black font-bold text-base hover:shadow-xl hover:shadow-gold-500/25 transition-all transform hover:-translate-y-1">
+                        <i class="fa-regular fa-calendar-check mr-2"></i> Записаться на визит
+                    </a>
+                    <a href="#services" class="w-full sm:w-auto px-8 py-4 rounded-full glass-panel text-white font-semibold text-base hover:bg-white/10 transition-all border border-white/15">
+                        Смотреть прайс-лист
+                    </a>
+                </div>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 pt-12 border-t border-white/10 max-w-4xl mx-auto">
+                    <div class="p-4 rounded-xl glass-panel">
+                        <div class="font-serif text-3xl font-bold text-gold-500">7+</div>
+                        <div class="text-xs text-gray-400 uppercase tracking-wider mt-1">Лет на рынке</div>
+                    </div>
+                    <div class="p-4 rounded-xl glass-panel">
+                        <div class="font-serif text-3xl font-bold text-gold-500">12K+</div>
+                        <div class="text-xs text-gray-400 uppercase tracking-wider mt-1">Довольных клиентов</div>
+                    </div>
+                    <div class="p-4 rounded-xl glass-panel">
+                        <div class="font-serif text-3xl font-bold text-gold-500">4.9</div>
+                        <div class="text-xs text-gray-400 uppercase tracking-wider mt-1">Рейтинг Яндекс / Google</div>
+                    </div>
+                    <div class="p-4 rounded-xl glass-panel">
+                        <div class="font-serif text-3xl font-bold text-gold-500">100%</div>
+                        <div class="text-xs text-gray-400 uppercase tracking-wider mt-1">Премиум косметика</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Why Us / Benefits -->
+        <section id="why-us" class="py-24 px-4 relative">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="text-xs font-semibold tracking-widest text-gold-500 uppercase mb-2">Наши преимущества</h2>
+                    <h3 class="font-serif text-3xl sm:text-5xl font-bold">Почему выбирают нас</h3>
+                    <p class="text-gray-400 mt-4">Каждая деталь в нашем салоне продумана для вашего максимального комфорта и идеального результата.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Card 1 -->
+                    <div class="glass-panel p-8 rounded-2xl gold-border-glow transition-all duration-300 group hover:-translate-y-2">
+                        <div class="w-14 h-14 rounded-xl bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-gold-500 text-2xl mb-6 group-hover:bg-gold-500 group-hover:text-black transition-all">
+                            <i class="fa-solid fa-user-ninja"></i>
+                        </div>
+                        <h4 class="font-serif text-xl font-bold mb-3">Топовые барберы</h4>
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            Наши мастера регулярно проходят стажировки у ведущих мировых стилистов и знают все нюансы современных техник.
+                        </p>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="glass-panel p-8 rounded-2xl gold-border-glow transition-all duration-300 group hover:-translate-y-2">
+                        <div class="w-14 h-14 rounded-xl bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-gold-500 text-2xl mb-6 group-hover:bg-gold-500 group-hover:text-black transition-all">
+                            <i class="fa-solid fa-whiskey-glass"></i>
+                        </div>
+                        <h4 class="font-serif text-xl font-bold mb-3">Бесплатный бар</h4>
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            Угощаем каждого гостя свежесваренным зерновым кофе, крафтовыми напитками или элитным односолодовым виски.
+                        </p>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="glass-panel p-8 rounded-2xl gold-border-glow transition-all duration-300 group hover:-translate-y-2">
+                        <div class="w-14 h-14 rounded-xl bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-gold-500 text-2xl mb-6 group-hover:bg-gold-500 group-hover:text-black transition-all">
+                            <i class="fa-solid fa-pump-soap"></i>
+                        </div>
+                        <h4 class="font-serif text-xl font-bold mb-3">Люксовая косметика</h4>
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            Используем только профессиональные бренды (Morgan's, Reuzel, Baxter of California) для идеально ухоженных волос и кожи.
+                        </p>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div class="glass-panel p-8 rounded-2xl gold-border-glow transition-all duration-300 group hover:-translate-y-2">
+                        <div class="w-14 h-14 rounded-xl bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-gold-500 text-2xl mb-6 group-hover:bg-gold-500 group-hover:text-black transition-all">
+                            <i class="fa-solid fa-gamepad"></i>
+                        </div>
+                        <h4 class="font-serif text-xl font-bold mb-3">Lounge & PS5 Зона</h4>
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            Удобная лаунж-зона с коврами, виниловым проигрывателем и новейшей консолью PlayStation 5 для ожидания или отдыха.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Services & Pricing -->
+        <section id="services" class="py-24 px-4 relative">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="text-xs font-semibold tracking-widest text-gold-500 uppercase mb-2">Прайс-лист</h2>
+                    <h3 class="font-serif text-3xl sm:text-5xl font-bold">Популярные услуги</h3>
+                    <p class="text-gray-400 mt-4">Выберите услугу для быстрой записи. Все цены окончательные и включают мытьё головы и укладку.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Service 1 -->
+                    <div class="glass-panel p-6 rounded-2xl border border-white/10 hover:border-gold-500/50 transition-all duration-300 flex flex-col justify-between group">
+                        <div>
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="px-3 py-1 rounded-full text-xs bg-gold-500/10 text-gold-400 border border-gold-500/20">Хит продаж</span>
+                                <div class="font-serif text-2xl font-bold text-gold-400">1 800 ₽</div>
+                            </div>
+                            <h4 class="font-serif text-xl font-bold text-white mb-2 group-hover:text-gold-400 transition-colors">Мужская стрижка (Fade / Undercut)</h4>
+                            <p class="text-gray-400 text-sm mb-6">Мытье головы, подбор формы, стрижка ножницами и машинкой, укладка премиальной косметикой.</p>
+                        </div>
+                        <button onclick="selectService('Мужская классическая стрижка', '1800')" class="w-full py-3 rounded-xl bg-white/5 hover:bg-gold-500 hover:text-black border border-white/10 hover:border-gold-500 text-sm font-semibold transition-all flex items-center justify-center gap-2">
+                            <span>Записаться на услугу</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </button>
+                    </div>
+
+                    <!-- Service 2 -->
+                    <div class="glass-panel p-6 rounded-2xl border border-white/10 hover:border-gold-500/50 transition-all duration-300 flex flex-col justify-between group">
+                        <div>
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="px-3 py-1 rounded-full text-xs bg-white/10 text-gray-300">Классика</span>
+                                <div class="font-serif text-2xl font-bold text-gold-400">1 200 ₽</div>
+                            </div>
+                            <h4 class="font-serif text-xl font-bold text-white mb-2 group-hover:text-gold-400 transition-colors">Моделирование бороды и усов</h4>
+                            <p class="text-gray-400 text-sm mb-6">Создание четких контуров, распаривание горячим полотенцем, подбривание опасной бритвой и уход с маслом.</p>
+                        </div>
+                        <button onclick="selectService('Моделирование бороды', '1200')" class="w-full py-3 rounded-xl bg-white/5 hover:bg-gold-500 hover:text-black border border-white/10 hover:border-gold-500 text-sm font-semibold transition-all flex items-center justify-center gap-2">
+                            <span>Записаться на услугу</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </button>
+                    </div>
+
+                    <!-- Service 3 -->
+                    <div class="glass-panel-gold p-6 rounded-2xl relative overflow-hidden flex flex-col justify-between group transform hover:-translate-y-1 transition-all">
+                        <div class="absolute -right-8 -top-8 w-24 h-24 bg-gold-500/20 rounded-full blur-xl pointer-events-none"></div>
+                        <div>
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="px-3 py-1 rounded-full text-xs bg-gold-500 text-black font-bold">Выгодно</span>
+                                <div class="font-serif text-2xl font-bold text-gold-400">2 600 ₽</div>
+                            </div>
+                            <h4 class="font-serif text-xl font-bold text-white mb-2 group-hover:text-gold-400 transition-colors">Комплекс «Стрижка + Борода»</h4>
+                            <p class="text-gray-400 text-sm mb-6">Полный уход за волосами и бородой. Идеальный выбор для тех, кто ценит свое время и стиль.</p>
+                        </div>
+                        <button onclick="selectService('Комплекс Стрижка + Борода', '2600')" class="w-full py-3 rounded-xl bg-gold-500 text-black font-bold text-sm hover:bg-gold-400 transition-all flex items-center justify-center gap-2">
+                            <span>Записаться на комплекс</span>
+                            <i class="fa-solid fa-star text-xs"></i>
+                        </button>
+                    </div>
+
+                    <!-- Service 4 -->
+                    <div class="glass-panel p-6 rounded-2xl border border-white/10 hover:border-gold-500/50 transition-all duration-300 flex flex-col justify-between group">
+                        <div>
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="px-3 py-1 rounded-full text-xs bg-white/10 text-gray-300">Для дам</span>
+                                <div class="font-serif text-2xl font-bold text-gold-400">2 500 ₽</div>
+                            </div>
+                            <h4 class="font-serif text-xl font-bold text-white mb-2 group-hover:text-gold-400 transition-colors">Женская стрижка и укладка</h4>
+                            <p class="text-gray-400 text-sm mb-6">Индивидуальный подбор формы стилистом, мытье головы с восстанавливающим уходом и финальная стайлинг-укладка.</p>
+                        </div>
+                        <button onclick="selectService('Женская стрижка и укладка', '2500')" class="w-full py-3 rounded-xl bg-white/5 hover:bg-gold-500 hover:text-black border border-white/10 hover:border-gold-500 text-sm font-semibold transition-all flex items-center justify-center gap-2">
+                            <span>Записаться на услугу</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </button>
+                    </div>
+
+                    <!-- Service 5 -->
+                    <div class="glass-panel p-6 rounded-2xl border border-white/10 hover:border-gold-500/50 transition-all duration-300 flex flex-col justify-between group">
+                        <div>
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="px-3 py-1 rounded-full text-xs bg-white/10 text-gray-300">Топовый уход</span>
+                                <div class="font-serif text-2xl font-bold text-gold-400">2 000 ₽</div>
+                            </div>
+                            <h4 class="font-serif text-xl font-bold text-white mb-2 group-hover:text-gold-400 transition-colors">Камуфляж седины / Окрашивание</h4>
+                            <p class="text-gray-400 text-sm mb-6">Мягкое незаметное тонирование седины естественным оттенком за 20 минут или полное профессиональное окрашивание.</p>
+                        </div>
+                        <button onclick="selectService('Камуфляж седины / Окрашивание', '2000')" class="w-full py-3 rounded-xl bg-white/5 hover:bg-gold-500 hover:text-black border border-white/10 hover:border-gold-500 text-sm font-semibold transition-all flex items-center justify-center gap-2">
+                            <span>Записаться на услугу</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </button>
+                    </div>
+
+                    <!-- Service 6 -->
+                    <div class="glass-panel p-6 rounded-2xl border border-white/10 hover:border-gold-500/50 transition-all duration-300 flex flex-col justify-between group">
+                        <div>
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="px-3 py-1 rounded-full text-xs bg-white/10 text-gray-300">До 12 лет</span>
+                                <div class="font-serif text-2xl font-bold text-gold-400">1 400 ₽</div>
+                            </div>
+                            <h4 class="font-serif text-xl font-bold text-white mb-2 group-hover:text-gold-400 transition-colors">Детская стрижка</h4>
+                            <p class="text-gray-400 text-sm mb-6">Стильная стрижка для юных джентльменов. Аккуратный подход мастера, мультики или консоль во время работы.</p>
+                        </div>
+                        <button onclick="selectService('Детская стрижка', '1400')" class="w-full py-3 rounded-xl bg-white/5 hover:bg-gold-500 hover:text-black border border-white/10 hover:border-gold-500 text-sm font-semibold transition-all flex items-center justify-center gap-2">
+                            <span>Записаться на услугу</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Booking Form (Active & Mail Ready) -->
+        <section id="booking" class="py-24 px-4 relative">
+            <div class="max-w-4xl mx-auto">
+                <div class="glass-panel p-8 sm:p-12 rounded-3xl gold-border-glow relative overflow-hidden">
+                    
+                    <div class="text-center max-w-2xl mx-auto mb-10">
+                        <span class="text-xs font-semibold tracking-widest text-gold-500 uppercase">Онлайн Бронирование</span>
+                        <h3 class="font-serif text-3xl sm:text-4xl font-bold mt-2">Запишитесь на удобное время</h3>
+                        <p class="text-gray-400 text-sm mt-2">Оставьте заявку, и наш администратор свяжется с вами в течение 5 минут для подтверждения.</p>
+                    </div>
+
+                    <form id="appointment-form" onsubmit="handleFormSubmit(event)" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Name -->
+                            <div>
+                                <label class="block text-xs uppercase tracking-wider text-gray-400 mb-2">Ваше Имя *</label>
+                                <div class="relative">
+                                    <i class="fa-regular fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                    <input type="text" id="client-name" required placeholder="Александр" class="w-full bg-dark-900/80 border border-white/10 focus:border-gold-500 rounded-xl py-3 pl-11 pr-4 text-white text-sm focus:outline-none transition-colors">
+                                </div>
+                            </div>
+
+                            <!-- Phone -->
+                            <div>
+                                <label class="block text-xs uppercase tracking-wider text-gray-400 mb-2">Номер телефона *</label>
+                                <div class="relative">
+                                    <i class="fa-solid fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                    <input type="tel" id="client-phone" required placeholder="+7 (999) 000-00-00" class="w-full bg-dark-900/80 border border-white/10 focus:border-gold-500 rounded-xl py-3 pl-11 pr-4 text-white text-sm focus:outline-none transition-colors">
+                                </div>
+                            </div>
+
+                            <!-- Email -->
+                            <div>
+                                <label class="block text-xs uppercase tracking-wider text-gray-400 mb-2">Ваш E-mail (для подтверждения) *</label>
+                                <div class="relative">
+                                    <i class="fa-regular fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                    <input type="email" id="client-email" required placeholder="alex@mail.ru" class="w-full bg-dark-900/80 border border-white/10 focus:border-gold-500 rounded-xl py-3 pl-11 pr-4 text-white text-sm focus:outline-none transition-colors">
+                                </div>
+                            </div>
+
+                            <!-- Service Select -->
+                            <div>
+                                <label class="block text-xs uppercase tracking-wider text-gray-400 mb-2">Выберите услугу *</label>
+                                <div class="relative">
+                                    <i class="fa-solid fa-scissors absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                    <select id="client-service" required class="w-full bg-dark-900/80 border border-white/10 focus:border-gold-500 rounded-xl py-3 pl-11 pr-4 text-white text-sm focus:outline-none transition-colors appearance-none">
+                                        <option value="" disabled selected>Выберите услугу из списка</option>
+                                        <option value="Мужская классическая стрижка (1 800 ₽)">Мужская классическая стрижка — 1 800 ₽</option>
+                                        <option value="Моделирование бороды (1 200 ₽)">Моделирование бороды и усов — 1 200 ₽</option>
+                                        <option value="Комплекс Стрижка + Борода (2 600 ₽)">Комплекс «Стрижка + Борода» — 2 600 ₽</option>
+                                        <option value="Женская стрижка и укладка (2 500 ₽)">Женская стрижка и укладка — 2 500 ₽</option>
+                                        <option value="Камуфляж седины / Окрашивание (2 000 ₽)">Камуфляж седины / Окрашивание — 2 000 ₽</option>
+                                        <option value="Детская стрижка (1 400 ₽)">Детская стрижка — 1 400 ₽</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Date -->
+                            <div>
+                                <label class="block text-xs uppercase tracking-wider text-gray-400 mb-2">Желаемая дата *</label>
+                                <div class="relative">
+                                    <i class="fa-regular fa-calendar absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                    <input type="date" id="client-date" required class="w-full bg-dark-900/80 border border-white/10 focus:border-gold-500 rounded-xl py-3 pl-11 pr-4 text-white text-sm focus:outline-none transition-colors">
+                                </div>
+                            </div>
+
+                            <!-- Time -->
+                            <div>
+                                <label class="block text-xs uppercase tracking-wider text-gray-400 mb-2">Время визита *</label>
+                                <div class="relative">
+                                    <i class="fa-regular fa-clock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                    <select id="client-time" required class="w-full bg-dark-900/80 border border-white/10 focus:border-gold-500 rounded-xl py-3 pl-11 pr-4 text-white text-sm focus:outline-none transition-colors appearance-none">
+                                        <option value="" disabled selected>Выберите время</option>
+                                        <option value="10:00">10:00</option>
+                                        <option value="11:30">11:30</option>
+                                        <option value="13:00">13:00</option>
+                                        <option value="14:30">14:30</option>
+                                        <option value="16:00">16:00</option>
+                                        <option value="17:30">17:30</option>
+                                        <option value="19:00">19:00</option>
+                                        <option value="20:30">20:30</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Comment -->
+                        <div>
+                            <label class="block text-xs uppercase tracking-wider text-gray-400 mb-2">Комментарий к записи (опционально)</label>
+                            <textarea id="client-comment" rows="3" placeholder="Пожелания по мастеру или укладке..." class="w-full bg-dark-900/80 border border-white/10 focus:border-gold-500 rounded-xl py-3 px-4 text-white text-sm focus:outline-none transition-colors"></textarea>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="text-center pt-4">
+                            <button type="submit" id="submit-btn" class="w-full sm:w-auto px-10 py-4 rounded-full bg-gradient-to-r from-gold-600 via-gold-500 to-gold-400 text-black font-bold text-base hover:shadow-xl hover:shadow-gold-500/30 transition-all transform hover:-translate-y-0.5">
+                                <i class="fa-solid fa-paper-plane mr-2"></i> Подтвердить запись
+                            </button>
+                        </div>
+
+                        <p class="text-center text-xs text-gray-500">
+                            Нажимая кнопку, вы даете согласие на обработку персональных данных.
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gallery Section -->
+        <section id="gallery" class="py-24 px-4 relative">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="text-xs font-semibold tracking-widest text-gold-500 uppercase mb-2">Портфолио</h2>
+                    <h3 class="font-serif text-3xl sm:text-5xl font-bold">Галерея работ</h3>
+                    <p class="text-gray-400 mt-4">Примеры стрижек и укладок от наших ведущих мастеров.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="glass-panel rounded-2xl overflow-hidden group border border-white/10 hover:border-gold-500/50 transition-all">
+                        <div class="h-72 bg-dark-800 relative overflow-hidden flex items-center justify-center">
+                            <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=800&q=80" alt="Мужская стрижка Fade" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onerror="this.src='https://placehold.co/600x400/12141C/D4AF37?text=Fade+Cut'">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-6 flex flex-col justify-end">
+                                <span class="text-gold-400 text-xs uppercase font-semibold">Стиль: Skin Fade</span>
+                                <h5 class="text-white font-serif font-bold text-lg">Классический текстурный фейд</h5>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel rounded-2xl overflow-hidden group border border-white/10 hover:border-gold-500/50 transition-all">
+                        <div class="h-72 bg-dark-800 relative overflow-hidden flex items-center justify-center">
+                            <img src="https://images.unsplash.com/photo-1622286342621-4bd786c2447c?auto=format&fit=crop&w=800&q=80" alt="Моделирование бороды" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onerror="this.src='https://placehold.co/600x400/12141C/D4AF37?text=Beard+Style'">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-6 flex flex-col justify-end">
+                                <span class="text-gold-400 text-xs uppercase font-semibold">Стиль: Beard Care</span>
+                                <h5 class="text-white font-serif font-bold text-lg">Контурная стрижка бороды</h5>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel rounded-2xl overflow-hidden group border border-white/10 hover:border-gold-500/50 transition-all">
+                        <div class="h-72 bg-dark-800 relative overflow-hidden flex items-center justify-center">
+                            <img src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=800&q=80" alt="Укладка и стрижка" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onerror="this.src='https://placehold.co/600x400/12141C/D4AF37?text=Modern+Crop'">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-6 flex flex-col justify-end">
+                                <span class="text-gold-400 text-xs uppercase font-semibold">Стиль: Modern Crop</span>
+                                <h5 class="text-white font-serif font-bold text-lg">Современный Кроп с матовой укладкой</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reviews Section -->
+        <section id="reviews" class="py-24 px-4 relative">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="text-xs font-semibold tracking-widest text-gold-500 uppercase mb-2">Отзывы</h2>
+                    <h3 class="font-serif text-3xl sm:text-5xl font-bold">Что говорят наши гости</h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="glass-panel p-8 rounded-2xl border border-white/10 flex flex-col justify-between">
+                        <div>
+                            <div class="flex text-gold-500 gap-1 mb-4">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                            </div>
+                            <p class="text-gray-300 text-sm leading-relaxed italic mb-6">
+                                "Лучший барбершоп в городе! Мастер идеально подобрал форму под особенности лица. Атмосфера невероятная — виски, хорошая музыка и классный сервис."
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-gold-500/20 text-gold-400 flex items-center justify-center font-bold">МВ</div>
+                            <div>
+                                <h6 class="text-sm font-bold text-white">Михаил В.</h6>
+                                <span class="text-xs text-gray-500">Постоянный клиент</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-8 rounded-2xl border border-white/10 flex flex-col justify-between">
+                        <div>
+                            <div class="flex text-gold-500 gap-1 mb-4">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                            </div>
+                            <p class="text-gray-300 text-sm leading-relaxed italic mb-6">
+                                "Ходим сюда вместе с сыном на комплекс. Огромный плюс — детская стрижка проходит без капризов, пока сын играет в PS5. Отдельный респект за уход за бородой!"
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-gold-500/20 text-gold-400 flex items-center justify-center font-bold">АК</div>
+                            <div>
+                                <h6 class="text-sm font-bold text-white">Артем К.</h6>
+                                <span class="text-xs text-gray-500">Оценка на Яндекс</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-8 rounded-2xl border border-white/10 flex flex-col justify-between">
+                        <div>
+                            <div class="flex text-gold-500 gap-1 mb-4">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                            </div>
+                            <p class="text-gray-300 text-sm leading-relaxed italic mb-6">
+                                "Делала женскую стрижку и каре — мастер просто волшебник! Волосы лежат идеально даже без укладки дома. Теперь я постоянный гость!"
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-gold-500/20 text-gold-400 flex items-center justify-center font-bold">ЕП</div>
+                            <div>
+                                <h6 class="text-sm font-bold text-white">Елена П.</h6>
+                                <span class="text-xs text-gray-500">Оценка в Google</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contacts Section -->
+        <section id="contacts" class="py-24 px-4 relative border-t border-white/10">
+            <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                
+                <div class="space-y-8">
+                    <div>
+                        <h2 class="text-xs font-semibold tracking-widest text-gold-500 uppercase mb-2">Контакты & Локация</h2>
+                        <h3 class="font-serif text-3xl sm:text-5xl font-bold">Ждем вас в гости</h3>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-gold-500 shrink-0">
+                                <i class="fa-solid fa-location-dot text-xl"></i>
+                            </div>
+                            <div>
+                                <h5 class="text-white font-bold text-lg">Адрес</h5>
+                                <p class="text-gray-400 text-sm mt-1">г. Москва, ул. Невский проспект, д. 25 (м. Центральная)</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-gold-500 shrink-0">
+                                <i class="fa-solid fa-clock text-xl"></i>
+                            </div>
+                            <div>
+                                <h5 class="text-white font-bold text-lg">Режим работы</h5>
+                                <p class="text-gray-400 text-sm mt-1">Ежедневно: с 10:00 до 22:00 (Без выходных)</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-gold-500 shrink-0">
+                                <i class="fa-solid fa-phone text-xl"></i>
+                            </div>
+                            <div>
+                                <h5 class="text-white font-bold text-lg">Телефон / Мессенджеры</h5>
+                                <p class="text-gray-400 text-sm mt-1">+7 (999) 000-00-00 / WhatsApp & Telegram</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Social links -->
+                    <div class="flex gap-4 pt-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-gold-500 hover:border-gold-500 transition-all">
+                            <i class="fa-brands fa-telegram"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-gold-500 hover:border-gold-500 transition-all">
+                            <i class="fa-brands fa-vk"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-gold-500 hover:border-gold-500 transition-all">
+                            <i class="fa-brands fa-whatsapp"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Interactive Map / Location Preview -->
+                <div class="glass-panel p-4 rounded-3xl border border-white/10 h-96 relative overflow-hidden">
+                    <iframe class="w-full h-full rounded-2xl filter grayscale contrast-125 opacity-80 hover:opacity-100 transition-opacity" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2245.3856149177114!2d37.6173!3d55.7558!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNTXCsDQ1JzIwLjkiTiAzN8KwMzcnMDIuMyJF!5e0!3m2!1sru!2sru!4v1620000000000" loading="lazy"></iframe>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="py-8 border-t border-white/10 text-center text-xs text-gray-500">
+            <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div>© 2026 BARBER & STYLE. Все права защищены.</div>
+                <div class="flex gap-6">
+                    <a href="#" class="hover:text-gold-500 transition-colors">Политика конфиденциальности</a>
+                    <a href="#" class="hover:text-gold-500 transition-colors">Договор оферты</a>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Success Modal Window -->
+    <div id="modal-success" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden px-4">
+        <div class="glass-panel-gold p-8 sm:p-10 rounded-3xl max-w-md w-full text-center space-y-6 animate-bounce-short">
+            <div class="w-20 h-20 rounded-full bg-gold-500/20 border-2 border-gold-500 mx-auto flex items-center justify-center text-gold-500 text-3xl">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            
+            <h4 class="font-serif text-2xl font-bold text-white">Заявка принята!</h4>
+            
+            <p class="text-gray-300 text-sm leading-relaxed" id="modal-details">
+                Спасибо, <span id="modal-user-name" class="font-bold text-gold-400"></span>! Ваша запись успешно сформирована и отправлена администратору.
+            </p>
+
+            <div class="p-4 rounded-xl bg-dark-900/90 text-left text-xs text-gray-300 space-y-2 border border-gold-500/20">
+                <div><strong>Услуга:</strong> <span id="modal-service-name"></span></div>
+                <div><strong>Дата & Время:</strong> <span id="modal-date-time"></span></div>
+                <div><strong>E-mail:</strong> <span id="modal-email"></span></div>
+            </div>
+
+            <button onclick="closeModal()" class="w-full py-3 rounded-full bg-gold-500 text-black font-bold hover:bg-gold-400 transition-all">
+                Отлично, спасибо
+            </button>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic & Three.js 3D Background Integration -->
+    <script>
+        // --- 1. Three.js 3D Background Setup ---
+        let scene, camera, renderer, particles, geometricShape;
+
+        function init3D() {
+            const container = document.getElementById('canvas-container');
+            
+            // Scene
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x0B0C10, 0.035);
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 15;
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+
+            const pointLight = new THREE.PointLight(0xD4AF37, 2, 50);
+            pointLight.position.set(10, 10, 10);
+            scene.add(pointLight);
+
+            const pointLight2 = new THREE.PointLight(0x8B6508, 1.5, 50);
+            pointLight2.position.set(-10, -10, -5);
+            scene.add(pointLight2);
+
+            // Objects: Floating Gold Crystal (Geometric Icosahedron)
+            const geometry = new THREE.IcosahedronGeometry(3, 1);
+            const material = new THREE.MeshStandardMaterial({
+                color: 0xD4AF37,
+                wireframe: true,
+                metalness: 0.8,
+                roughness: 0.2
+            });
+            geometricShape = new THREE.Mesh(geometry, material);
+            geometricShape.position.set(6, 1, 0);
+            scene.add(geometricShape);
+
+            // Particle Field (Gold dust / Sparks)
+            const particleCount = 400;
+            const particleGeo = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+
+            for (let i = 0; i < particleCount * 3; i++) {
+                positions[i] = (Math.random() - 0.5) * 40;
+            }
+
+            particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+            const particleMat = new THREE.PointsMaterial({
+                color: 0xD4AF37,
+                size: 0.08,
+                transparent: true,
+                opacity: 0.6
+            });
+
+            particles = new THREE.Points(particleGeo, particleMat);
+            scene.add(particles);
+
+            // Mouse Movement Reaction
+            document.addEventListener('mousemove', onMouseMove);
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        let mouseX = 0, mouseY = 0;
+        function onMouseMove(event) {
+            mouseX = (event.clientX - window.innerWidth / 2) * 0.001;
+            mouseY = (event.clientY - window.innerHeight / 2) * 0.001;
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Rotate 3D shape
+            if (geometricShape) {
+                geometricShape.rotation.x += 0.003;
+                geometricShape.rotation.y += 0.005;
+            }
+
+            // Rotate particle field
+            if (particles) {
+                particles.rotation.y += 0.0008;
+                particles.rotation.x += 0.0004;
+            }
+
+            // Gentle camera movement towards mouse
+            camera.position.x += (mouseX * 5 - camera.position.x) * 0.05;
+            camera.position.y += (-mouseY * 5 - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+
+            renderer.render(scene, camera);
+        }
+
+        window.onload = function() {
+            init3D();
+            animate();
+            
+            // Set min date to today for booking form
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('client-date').min = today;
+        };
+
+        // --- 2. Interactive Service Selection ---
+        function selectService(serviceName, price) {
+            const serviceSelect = document.getElementById('client-service');
+            
+            for (let option of serviceSelect.options) {
+                if (option.value.includes(serviceName)) {
+                    option.selected = true;
+                    break;
+                }
+            }
+
+            // Scroll smoothly to booking form
+            document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // --- 3. Booking Form & Email Simulation ---
+        function handleFormSubmit(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('client-name').value;
+            const phone = document.getElementById('client-phone').value;
+            const email = document.getElementById('client-email').value;
+            const service = document.getElementById('client-service').value;
+            const date = document.getElementById('client-date').value;
+            const time = document.getElementById('client-time').value;
+            const comment = document.getElementById('client-comment').value;
+
+            // Update Modal Data
+            document.getElementById('modal-user-name').innerText = name;
+            document.getElementById('modal-service-name').innerText = service;
+            document.getElementById('modal-date-time').innerText = `${date} в ${time}`;
+            document.getElementById('modal-email').innerText = email;
+
+            // Show Success Modal
+            document.getElementById('modal-success').classList.remove('hidden');
+
+            // Console log simulation (Matches Formspree/EmailJS payload)
+            console.log("Заявка на бронирование отправлена:", {
+                to: "admin@barberstyle.ru",
+                clientName: name,
+                clientPhone: phone,
+                clientEmail: email,
+                bookedService: service,
+                date: date,
+                time: time,
+                comment: comment
+            });
+
+            // Reset form
+            document.getElementById('appointment-form').reset();
+        }
+
+        function closeModal() {
+            document.getElementById('modal-success').classList.add('hidden');
+        }
+
+        // --- 4. Mobile Menu Toggle ---
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>
